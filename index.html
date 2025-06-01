@@ -735,47 +735,55 @@ function regenerateCalendar() {
 // Grouper les demi-journées par périodes
 function groupConsecutiveHalfDays(availabilities) {
     const periods = [];
-    const grouped = { available: [], unavailable: [] };
+    const processedDates = new Set();
     
-    // Grouper par statut
+    // Grouper par date pour détecter les journées complètes
+    const dateGroups = {};
     for (let key in availabilities) {
+        const [dateStr, period] = key.split('-');
         const status = availabilities[key];
-        grouped[status].push(key);
+        
+        if (!dateGroups[dateStr]) {
+            dateGroups[dateStr] = {};
+        }
+        dateGroups[dateStr][period] = status;
     }
     
-    // Traiter chaque statut
-    Object.keys(grouped).forEach(status => {
-        if (grouped[status].length === 0) return;
+    // Traiter chaque date
+    Object.keys(dateGroups).sort().forEach(dateStr => {
+        const dayData = dateGroups[dateStr];
+        const morningStatus = dayData.morning;
+        const afternoonStatus = dayData.afternoon;
         
-        const sorted = grouped[status].sort();
-        let currentPeriod = null;
-        
-        sorted.forEach(key => {
-            const [dateStr, period] = key.split('-');
-            const date = dateStr;
-            
-            if (!currentPeriod || currentPeriod.endDate !== date || 
-                (currentPeriod.endPeriod === 'morning' && period === 'afternoon' && currentPeriod.endDate === date)) {
-                
-                if (currentPeriod) {
-                    periods.push(currentPeriod);
-                }
-                
-                currentPeriod = {
-                    startDate: date,
-                    startPeriod: period,
-                    endDate: date,
-                    endPeriod: period,
-                    status: status === 'available' ? 'Disponible' : 'Indisponible'
-                };
-            } else {
-                currentPeriod.endDate = date;
-                currentPeriod.endPeriod = period;
+        // Si les deux demi-journées existent avec le même statut = journée complète
+        if (morningStatus && afternoonStatus && morningStatus === afternoonStatus) {
+            periods.push({
+                startDate: dateStr,
+                endDate: dateStr,
+                startPeriod: 'full',
+                endPeriod: 'full',
+                status: morningStatus === 'available' ? 'Disponible' : 'Indisponible'
+            });
+        } else {
+            // Sinon, traiter les demi-journées séparément
+            if (morningStatus) {
+                periods.push({
+                    startDate: dateStr,
+                    endDate: dateStr,
+                    startPeriod: 'morning',
+                    endPeriod: 'morning',
+                    status: morningStatus === 'available' ? 'Disponible' : 'Indisponible'
+                });
             }
-        });
-        
-        if (currentPeriod) {
-            periods.push(currentPeriod);
+            if (afternoonStatus) {
+                periods.push({
+                    startDate: dateStr,
+                    endDate: dateStr,
+                    startPeriod: 'afternoon',
+                    endPeriod: 'afternoon',
+                    status: afternoonStatus === 'available' ? 'Disponible' : 'Indisponible'
+                });
+            }
         }
     });
     
@@ -796,8 +804,17 @@ function updateSummary() {
             let html = '<strong>Créneaux qui seront envoyés :</strong><br><br>';
             
             periods.forEach(period => {
-                const periodText = period.startPeriod === 'morning' ? 'AM' : 'PM';
-                const endPeriodText = period.endPeriod === 'morning' ? 'AM' : 'PM';
+                let periodText;
+                if (period.startPeriod === 'full') {
+                    periodText = 'Journée';
+                } else if (period.startPeriod === 'morning') {
+                    periodText = 'AM';
+                } else {
+                    periodText = 'PM';
+                }
+                
+                const endPeriodText = period.endPeriod === 'full' ? 'Journée' : 
+                                    (period.endPeriod === 'morning' ? 'AM' : 'PM');
                 
                 if (period.startDate === period.endDate && period.startPeriod === period.endPeriod) {
                     html += `📅 ${period.startDate} ${periodText} : ${period.status}<br>`;
@@ -852,17 +869,29 @@ document.addEventListener('DOMContentLoaded', function() {
             const promises = [];
             
             periods.forEach(period => {
+                // Déterminer la période à envoyer
+                let periodValue;
+                if (period.startPeriod === 'full') {
+                    periodValue = 'Journée';
+                } else if (period.startPeriod === 'morning') {
+                    periodValue = 'Matin';
+                } else {
+                    periodValue = 'Après-midi';
+                }
+                
                 const recordData = {
                     fields: {
-                        "Nom": artistName,
+                        "Contact text": artistName,
                         "Début disponibilité": period.startDate,
                         "Fin disponibilité": period.endDate,
-                        "Période": period.startPeriod === 'morning' ? 'Matin' : 'Après-midi',
+                        "Période": periodValue,
                         "Statut_Disponibilite": period.status,
                         "Commentaires": comments,
                         "Statut": "Reçu"
                     }
                 };
+                
+                console.log('📤 Record envoyé:', recordData);
                 
                 const promise = fetch('https://api.airtable.com/v0/appfsMAdTCEaXSYfK/Disponibilités équipes', {
                     method: 'POST',
@@ -871,28 +900,46 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(recordData)
-                }).then(response => response.json().then(data => response));
+                }).then(response => {
+                    console.log('📥 Réponse Airtable:', response.status, response.statusText);
+                    return response.json().then(data => {
+                        console.log('📋 Données reçues:', data);
+                        if (!response.ok) {
+                            console.error('❌ Erreur Airtable:', data);
+                            throw new Error(`Erreur ${response.status}: ${data.error?.message || 'Erreur inconnue'}`);
+                        }
+                        return response;
+                    });
+                }).catch(error => {
+                    console.error('❌ Erreur fetch:', error);
+                    throw error;
+                });
                 
                 promises.push(promise);
             });
             
             Promise.all(promises)
                 .then(responses => {
+                    console.log('📊 Toutes les réponses:', responses);
+                    
+                    // Vérifier que tous les envois ont réussi
                     const allSuccessful = responses.every(response => response.ok);
                     
                     if (allSuccessful) {
-                        alert(`Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} créneau(x).`);
+                        alert(`✅ Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} créneau(x).`);
                         form.reset();
                         availabilities = {};
                         updateSummary();
                         regenerateCalendar(); // Utiliser la nouvelle fonction
                     } else {
-                        throw new Error('Certains envois ont échoué');
+                        const failedResponses = responses.filter(r => !r.ok);
+                        console.error('❌ Échecs:', failedResponses);
+                        throw new Error(`${failedResponses.length} envoi(s) ont échoué sur ${responses.length}`);
                     }
                 })
                 .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de l\'envoi : ' + error.message);
+                    console.error('❌ Erreur complète:', error);
+                    alert(`❌ Erreur lors de l'envoi :\n${error.message}\n\nVérifiez la console (F12) pour plus de détails.`);
                 });
         });
     }
