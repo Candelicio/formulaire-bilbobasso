@@ -751,7 +751,14 @@ function groupConsecutiveHalfDays(availabilities) {
     const dateGroups = {};
     for (let key in availabilities) {
         console.log('🔑 Traitement clé:', key, '=', availabilities[key]);
-        const [dateStr, period] = key.split('-');
+        
+        // Découper correctement : "2025-06-04-afternoon" -> ["2025-06-04", "afternoon"]
+        const lastDashIndex = key.lastIndexOf('-');
+        const dateStr = key.substring(0, lastDashIndex); // "2025-06-04"
+        const period = key.substring(lastDashIndex + 1); // "afternoon"
+        
+        console.log('📅 Date extraite:', dateStr, ', Période:', period);
+        
         const status = availabilities[key];
         
         if (!dateGroups[dateStr]) {
