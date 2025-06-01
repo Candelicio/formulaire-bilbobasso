@@ -667,9 +667,13 @@ function toggleFullDay(date) {
     const morningKey = `${dateStr}-morning`;
     const afternoonKey = `${dateStr}-afternoon`;
     
+    console.log(`🔄 Toggle journée entière pour ${dateStr}, statut: ${currentStatus}`);
+    
     // Appliquer le statut aux deux demi-journées
     availabilities[morningKey] = currentStatus;
     availabilities[afternoonKey] = currentStatus;
+    
+    console.log('📊 Availabilities après toggle journée:', availabilities);
     
     // Mettre à jour l'affichage
     regenerateCalendar();
@@ -681,8 +685,12 @@ function toggleHalfDay(date, period) {
     const dateStr = formatDate(date);
     const key = `${dateStr}-${period}`;
     
+    console.log(`🔄 Toggle ${period} pour ${dateStr}, clé: ${key}, statut: ${currentStatus}`);
+    
     // Appliquer le nouveau statut
     availabilities[key] = currentStatus;
+    
+    console.log('📊 Availabilities après toggle:', availabilities);
     
     // Mettre à jour l'affichage
     regenerateCalendar();
@@ -734,12 +742,15 @@ function regenerateCalendar() {
 
 // Grouper les demi-journées par périodes
 function groupConsecutiveHalfDays(availabilities) {
+    console.log('🔍 Début groupement avec:', availabilities);
+    
     const periods = [];
     const processedDates = new Set();
     
     // Grouper par date pour détecter les journées complètes
     const dateGroups = {};
     for (let key in availabilities) {
+        console.log('🔑 Traitement clé:', key, '=', availabilities[key]);
         const [dateStr, period] = key.split('-');
         const status = availabilities[key];
         
@@ -749,14 +760,19 @@ function groupConsecutiveHalfDays(availabilities) {
         dateGroups[dateStr][period] = status;
     }
     
+    console.log('📊 Groupes par date:', dateGroups);
+    
     // Traiter chaque date
     Object.keys(dateGroups).sort().forEach(dateStr => {
         const dayData = dateGroups[dateStr];
         const morningStatus = dayData.morning;
         const afternoonStatus = dayData.afternoon;
         
+        console.log(`📅 ${dateStr}: matin=${morningStatus}, après-midi=${afternoonStatus}`);
+        
         // Si les deux demi-journées existent avec le même statut = journée complète
         if (morningStatus && afternoonStatus && morningStatus === afternoonStatus) {
+            console.log(`✅ Journée complète détectée pour ${dateStr}`);
             periods.push({
                 startDate: dateStr,
                 endDate: dateStr,
@@ -767,6 +783,7 @@ function groupConsecutiveHalfDays(availabilities) {
         } else {
             // Sinon, traiter les demi-journées séparément
             if (morningStatus) {
+                console.log(`🌅 Matin séparé pour ${dateStr}: ${morningStatus}`);
                 periods.push({
                     startDate: dateStr,
                     endDate: dateStr,
@@ -776,6 +793,7 @@ function groupConsecutiveHalfDays(availabilities) {
                 });
             }
             if (afternoonStatus) {
+                console.log(`🌇 Après-midi séparé pour ${dateStr}: ${afternoonStatus}`);
                 periods.push({
                     startDate: dateStr,
                     endDate: dateStr,
@@ -787,6 +805,7 @@ function groupConsecutiveHalfDays(availabilities) {
         }
     });
     
+    console.log('🎯 Périodes finales générées:', periods);
     return periods;
 }
 
@@ -860,8 +879,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const artistName = nameField.value;
             const comments = notesField.value;
             
+            console.log('📋 Données du formulaire:');
+            console.log('👤 Nom:', artistName);
+            console.log('💬 Commentaires:', comments);
+            console.log('📅 Availabilities brutes:', availabilities);
+            console.log('🔢 Nombre de créneaux:', Object.keys(availabilities).length);
+            
             if (Object.keys(availabilities).length === 0) {
-                alert('Veuillez sélectionner au moins un créneau !');
+                alert('⚠️ Veuillez sélectionner au moins un créneau !');
                 return;
             }
             
