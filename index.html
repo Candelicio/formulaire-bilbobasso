@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -33,6 +33,7 @@
             gap: 15px;
             margin-bottom: 25px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
         .status-btn {
@@ -58,10 +59,45 @@
             background: transparent;
         }
         
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .nav-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .nav-btn:hover {
+            background: #0056b3;
+        }
+        
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .current-month {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 4px;
             margin-bottom: 30px;
             background: #f8f9fa;
             padding: 20px;
@@ -75,30 +111,97 @@
             padding: 10px;
             background: #e9ecef;
             border-radius: 5px;
+            font-size: 14px;
         }
         
         .calendar-day {
-            aspect-ratio: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             border: 2px solid #dee2e6;
             border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
             background: white;
+            min-height: 70px;
             position: relative;
         }
         
-        .calendar-day:hover {
-            border-color: #007bff;
-            transform: scale(1.05);
+        .calendar-day.other-month {
+            opacity: 0.3;
+            background: #f8f9fa;
         }
         
-        .calendar-day.other-month {
-            color: #ccc;
-            background: #f8f9fa;
+        .day-number {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            padding: 4px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        .half-days-container {
+            display: flex;
+            flex: 1;
+            gap: 2px;
+            padding: 2px;
+        }
+        
+        .half-day {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            min-height: 35px;
+            border: 1px solid #ddd;
+        }
+        
+        .half-day:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .half-day.morning {
+            background: #f0f8ff;
+        }
+        
+        .half-day.afternoon {
+            background: #fff8f0;
+        }
+        
+        .half-day.available {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .half-day.unavailable {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 15px;
+            border-radius: 3px;
         }
         
         .summary {
@@ -127,6 +230,27 @@
         .submit-btn:hover {
             transform: translateY(-2px);
         }
+        
+        @media (max-width: 768px) {
+            .calendar {
+                gap: 2px;
+                padding: 10px;
+            }
+            
+            .calendar-day {
+                min-height: 55px;
+            }
+            
+            .half-day {
+                font-size: 9px;
+                min-height: 25px;
+            }
+            
+            .day-number {
+                font-size: 11px;
+                padding: 2px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -154,93 +278,40 @@
                     </button>
                 </div>
                 <p style="color: #666; font-size: 14px; text-align: center; margin-top: 10px;">
-                    Puis cliquez sur les dates dans le calendrier
+                    Puis cliquez sur les créneaux AM/PM dans le calendrier
                 </p>
             </div>
 
-            <!-- Calendrier -->
-            <div style="margin-bottom: 20px;">
-                <h3 style="color: #333; margin-bottom: 15px;">Cliquez sur vos dates :</h3>
-                <div class="calendar">
-                    <div class="calendar-header">Lun</div>
-                    <div class="calendar-header">Mar</div>
-                    <div class="calendar-header">Mer</div>
-                    <div class="calendar-header">Jeu</div>
-                    <div class="calendar-header">Ven</div>
-                    <div class="calendar-header">Sam</div>
-                    <div class="calendar-header">Dim</div>
-                    
-                    <!-- Juin 2025 -->
-                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-26')">26</div>
-                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-27')">27</div>
-                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-28')">28</div>
-                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-29')">29</div>
-                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-30')">30</div>
-                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-31')">31</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-01')">1</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-02')">2</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-03')">3</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-04')">4</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-05')">5</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-06')">6</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-07')">7</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-08')">8</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-09')">9</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-10')">10</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-11')">11</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-12')">12</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-13')">13</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-14')">14</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-15')">15</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-16')">16</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-17')">17</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-18')">18</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-19')">19</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-20')">20</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-21')">21</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-22')">22</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-23')">23</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-24')">24</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-25')">25</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-26')">26</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-27')">27</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-28')">28</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-29')">29</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-30')">30</div>
-                    
-                    <!-- Juillet 2025 -->
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-01')">1</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-02')">2</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-03')">3</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-04')">4</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-05')">5</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-06')">6</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-07')">7</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-08')">8</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-09')">9</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-10')">10</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-11')">11</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-12')">12</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-13')">13</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-14')">14</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-15')">15</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-16')">16</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-17')">17</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-18')">18</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-19')">19</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-20')">20</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-21')">21</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-22')">22</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-23')">23</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-24')">24</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-25')">25</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-26')">26</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-27')">27</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-28')">28</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-29')">29</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-30')">30</div>
-                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-31')">31</div>
+            <!-- Légende -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f0f8ff;"></div>
+                    <span>AM (9h-13h)</span>
                 </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fff8f0;"></div>
+                    <span>PM (14h-18h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <span>Disponible</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f44336;"></div>
+                    <span>Indisponible</span>
+                </div>
+            </div>
+
+            <!-- Navigation du calendrier -->
+            <div class="calendar-navigation">
+                <button type="button" class="nav-btn" onclick="changeMonth(-1)">← Mois précédent</button>
+                <span class="current-month" id="currentMonth"></span>
+                <button type="button" class="nav-btn" onclick="changeMonth(1)">Mois suivant →</button>
+            </div>
+
+            <!-- Calendrier dynamique -->
+            <div class="calendar" id="calendar">
+                <!-- Généré dynamiquement -->
             </div>
 
             <!-- Résumé -->
@@ -265,73 +336,182 @@
 
     <script>
 let currentStatus = 'available';
-let availabilities = {};
+let availabilities = {}; // Format: "2025-06-01-morning": "available"
+let currentDate = new Date(2025, 5, 1); // Juin 2025 (mois 0-indexé)
 
-// Préfillage automatique
-document.addEventListener('DOMContentLoaded', function() {
-    // Préfillage par URL uniquement
-    setTimeout(function() {
-        const nameField = document.getElementById('artistName');
-        if (!nameField) {
-            console.log('Champ nom pas encore disponible, nouvel essai...');
-            setTimeout(arguments.callee, 500);
-            return;
-        }
+const monthNames = [
+    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+];
+
+const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+// Préfillage automatique AMÉLIORÉ
+function prefillName() {
+    const nameField = document.getElementById('artistName');
+    if (!nameField) return;
+    
+    let artistName = '';
+    
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        artistName = urlParams.get('nom') || urlParams.get('name') || '';
         
-        let artistName = '';
-        
-        // Méthode 1: URL standard (?nom=value)
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            artistName = urlParams.get('nom') || urlParams.get('name') || '';
-        } catch(e) {
-            console.log('URL params failed');
-        }
-        
-        // Méthode 2: Hash (#nom=value)
         if (!artistName && window.location.hash) {
-            try {
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                artistName = hashParams.get('nom') || hashParams.get('name') || '';
-            } catch(e) {
-                console.log('Hash params failed');
-            }
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            artistName = hashParams.get('nom') || hashParams.get('name') || '';
         }
         
-        // Méthode 3: Lecture manuelle de l'URL
         if (!artistName) {
             const url = window.location.href;
-            const match = url.match(/[?&#](?:nom|name)=([^&]+)/);
-            if (match) {
-                artistName = decodeURIComponent(match[1].replace(/\+/g, ' '));
+            const patterns = [
+                /[?&#]nom=([^&#]+)/i,
+                /[?&#]name=([^&#]+)/i,
+                /[?&#]n=([^&#]+)/i
+            ];
+            
+            for (let pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    artistName = decodeURIComponent(match[1].replace(/\+/g, ' '));
+                    break;
+                }
             }
         }
         
-        // Appliquer le préfillage si trouvé
-        if (artistName && nameField) {
+        if (artistName) {
+            artistName = artistName.trim();
             nameField.value = artistName;
             nameField.style.background = '#e8f5e8';
             nameField.style.borderColor = '#4CAF50';
             
-            // Ajouter un indicateur visuel
-            const nameFieldParent = nameField.parentNode;
-            if (nameFieldParent && !nameFieldParent.querySelector('.prefill-indicator')) {
+            const parent = nameField.parentNode;
+            if (!parent.querySelector('.prefill-indicator')) {
                 const indicator = document.createElement('div');
-                indicator.innerHTML = '✅ Nom prérempli automatiquement';
+                indicator.innerHTML = '✅ Nom prérempli: ' + artistName;
                 indicator.className = 'prefill-indicator';
-                indicator.style.color = '#4CAF50';
-                indicator.style.fontSize = '12px';
-                indicator.style.marginTop = '5px';
-                indicator.style.fontWeight = 'bold';
-                nameFieldParent.appendChild(indicator);
+                indicator.style.cssText = 'color: #4CAF50; font-size: 12px; margin-top: 5px; font-weight: bold;';
+                parent.appendChild(indicator);
             }
+            
+            console.log('✅ Préfillage réussi:', artistName);
         }
         
-        console.log('URL complète:', window.location.href);
-        console.log('Nom trouvé:', artistName);
-        console.log('Préfillage appliqué:', !!artistName);
-    }, 1000);
-});
+    } catch (e) {
+        console.error('Erreur préfillage:', e);
+    }
+}
+
+// Générer le calendrier dynamiquement
+function generateCalendar() {
+    const calendar = document.getElementById('calendar');
+    const currentMonthSpan = document.getElementById('currentMonth');
+    
+    // Mettre à jour le titre du mois
+    currentMonthSpan.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    
+    // Vider le calendrier
+    calendar.innerHTML = '';
+    
+    // Ajouter les en-têtes des jours
+    dayNames.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'calendar-header';
+        header.textContent = day;
+        calendar.appendChild(header);
+    });
+    
+    // Calculer le premier jour du mois et le nombre de jours
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    
+    // Premier jour de la semaine (0 = dimanche, 1 = lundi, etc.)
+    let startDay = firstDay.getDay();
+    startDay = startDay === 0 ? 6 : startDay - 1; // Convertir pour que lundi = 0
+    
+    // Ajouter les jours du mois précédent pour compléter la première semaine
+    for (let i = startDay - 1; i >= 0; i--) {
+        const prevMonthDay = new Date(year, month, -i);
+        createDayElement(prevMonthDay, true);
+    }
+    
+    // Ajouter tous les jours du mois actuel
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        createDayElement(date, false);
+    }
+    
+    // Compléter avec les jours du mois suivant
+    const totalCells = calendar.children.length - 7; // -7 pour les en-têtes
+    const remainingCells = 42 - totalCells; // 6 semaines * 7 jours = 42
+    for (let day = 1; day <= remainingCells; day++) {
+        const nextMonthDay = new Date(year, month + 1, day);
+        createDayElement(nextMonthDay, true);
+    }
+}
+
+// Créer un élément jour avec demi-journées
+function createDayElement(date, isOtherMonth) {
+    const dayElement = document.createElement('div');
+    dayElement.className = `calendar-day ${isOtherMonth ? 'other-month' : ''}`;
+    
+    // Numéro du jour
+    const dayNumber = document.createElement('div');
+    dayNumber.className = 'day-number';
+    dayNumber.textContent = date.getDate();
+    dayElement.appendChild(dayNumber);
+    
+    // Container pour les demi-journées côte à côte
+    const halfDaysContainer = document.createElement('div');
+    halfDaysContainer.className = 'half-days-container';
+    
+    // Demi-journée matin (AM)
+    const morning = document.createElement('div');
+    morning.className = 'half-day morning';
+    morning.textContent = 'AM';
+    morning.onclick = () => toggleHalfDay(date, 'morning');
+    halfDaysContainer.appendChild(morning);
+    
+    // Demi-journée après-midi (PM)
+    const afternoon = document.createElement('div');
+    afternoon.className = 'half-day afternoon';
+    afternoon.textContent = 'PM';
+    afternoon.onclick = () => toggleHalfDay(date, 'afternoon');
+    halfDaysContainer.appendChild(afternoon);
+    
+    dayElement.appendChild(halfDaysContainer);
+    
+    // Appliquer l'état existant si disponible
+    const dateStr = formatDate(date);
+    const morningKey = `${dateStr}-morning`;
+    const afternoonKey = `${dateStr}-afternoon`;
+    
+    if (availabilities[morningKey]) {
+        morning.classList.add(availabilities[morningKey]);
+    }
+    if (availabilities[afternoonKey]) {
+        afternoon.classList.add(availabilities[afternoonKey]);
+    }
+    
+    document.getElementById('calendar').appendChild(dayElement);
+}
+
+// Changer de mois
+function changeMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    generateCalendar();
+}
+
+// Formater la date en YYYY-MM-DD
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
 // Changer le statut sélectionné
 function setStatus(status) {
@@ -341,13 +521,11 @@ function setStatus(status) {
     const btnUnavailable = document.getElementById('btn-unavailable');
     
     if (btnAvailable && btnUnavailable) {
-        // Reset tous les boutons
         btnAvailable.style.background = 'transparent';
         btnAvailable.style.color = '#4CAF50';
         btnUnavailable.style.background = 'transparent';
         btnUnavailable.style.color = '#f44336';
         
-        // Activer le bouton sélectionné
         if (status === 'available') {
             btnAvailable.style.background = '#4CAF50';
             btnAvailable.style.color = 'white';
@@ -358,85 +536,86 @@ function setStatus(status) {
     }
 }
 
-// Cliquer sur une date
-function toggleDay(element, date) {
-    // Retirer l'ancien style
-    element.style.background = 'white';
-    element.style.color = 'black';
+// Basculer une demi-journée
+function toggleHalfDay(date, period) {
+    const dateStr = formatDate(date);
+    const key = `${dateStr}-${period}`;
+    
+    // Trouver l'élément dans le DOM
+    const halfDayElements = document.querySelectorAll(`.half-day.${period}`);
+    let targetElement = null;
+    
+    halfDayElements.forEach(el => {
+        const parentDay = el.closest('.calendar-day');
+        const dayNumber = parentDay.querySelector('.day-number').textContent;
+        if (parseInt(dayNumber) === date.getDate()) {
+            targetElement = el;
+        }
+    });
+    
+    if (!targetElement) return;
+    
+    // Retirer les anciens styles
+    targetElement.classList.remove('available', 'unavailable');
     
     // Appliquer le nouveau statut
-    availabilities[date] = currentStatus;
-    
-    if (currentStatus === 'available') {
-        element.style.background = '#4CAF50';
-        element.style.color = 'white';
-    } else if (currentStatus === 'unavailable') {
-        element.style.background = '#f44336';
-        element.style.color = 'white';
-    }
+    availabilities[key] = currentStatus;
+    targetElement.classList.add(currentStatus);
     
     updateSummary();
 }
 
-// Fonction pour grouper les dates consécutives en périodes
-function groupConsecutiveDates(availabilities) {
+// Grouper les demi-journées par périodes
+function groupConsecutiveHalfDays(availabilities) {
     const periods = [];
+    const grouped = { available: [], unavailable: [] };
     
-    // Séparer par statut (disponible/indisponible)
-    const availableDates = [];
-    const unavailableDates = [];
-    
-    for (let date in availabilities) {
-        if (availabilities[date] === 'available') {
-            availableDates.push(date);
-        } else {
-            unavailableDates.push(date);
-        }
+    // Grouper par statut
+    for (let key in availabilities) {
+        const status = availabilities[key];
+        grouped[status].push(key);
     }
     
-    // Traiter chaque type de statut
-    [
-        { dates: availableDates, status: 'Disponible' },
-        { dates: unavailableDates, status: 'Indisponible' }
-    ].forEach(group => {
-        if (group.dates.length === 0) return;
+    // Traiter chaque statut
+    Object.keys(grouped).forEach(status => {
+        if (grouped[status].length === 0) return;
         
-        // Trier les dates
-        const sortedDates = group.dates.sort();
+        const sorted = grouped[status].sort();
+        let currentPeriod = null;
         
-        let currentPeriod = {
-            start: sortedDates[0],
-            end: sortedDates[0],
-            status: group.status
-        };
-        
-        for (let i = 1; i < sortedDates.length; i++) {
-            const currentDate = new Date(sortedDates[i]);
-            const previousDate = new Date(currentPeriod.end);
-            const dayDifference = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
+        sorted.forEach(key => {
+            const [dateStr, period] = key.split('-');
+            const date = dateStr;
             
-            if (dayDifference === 1) {
-                // Date consécutive - étendre la période
-                currentPeriod.end = sortedDates[i];
-            } else {
-                // Date non consécutive - finaliser la période actuelle
-                periods.push(currentPeriod);
+            if (!currentPeriod || currentPeriod.endDate !== date || 
+                (currentPeriod.endPeriod === 'morning' && period === 'afternoon' && currentPeriod.endDate === date)) {
+                
+                if (currentPeriod) {
+                    periods.push(currentPeriod);
+                }
+                
                 currentPeriod = {
-                    start: sortedDates[i],
-                    end: sortedDates[i],
-                    status: group.status
+                    startDate: date,
+                    startPeriod: period,
+                    endDate: date,
+                    endPeriod: period,
+                    status: status === 'available' ? 'Disponible' : 'Indisponible'
                 };
+            } else {
+                currentPeriod.endDate = date;
+                currentPeriod.endPeriod = period;
             }
-        }
+        });
         
-        // Ajouter la dernière période
-        periods.push(currentPeriod);
+        if (currentPeriod) {
+            periods.push(currentPeriod);
+        }
     });
     
     return periods;
 }
 
-// Mettre à jour le résumé avec périodes
+// Mettre à jour le résumé
 function updateSummary() {
     const summary = document.getElementById('summary');
     const content = document.getElementById('summaryContent');
@@ -445,22 +624,22 @@ function updateSummary() {
         if (Object.keys(availabilities).length > 0) {
             summary.style.display = 'block';
             
-            // Grouper en périodes pour l'affichage
-            const periods = groupConsecutiveDates(availabilities);
+            const periods = groupConsecutiveHalfDays(availabilities);
             
-            let html = '<strong>Périodes qui seront envoyées :</strong><br><br>';
+            let html = '<strong>Créneaux qui seront envoyés :</strong><br><br>';
             
             periods.forEach(period => {
-                if (period.start === period.end) {
-                    // Jour isolé
-                    html += `📅 ${period.start} : ${period.status}<br>`;
+                const periodText = period.startPeriod === 'morning' ? 'AM' : 'PM';
+                const endPeriodText = period.endPeriod === 'morning' ? 'AM' : 'PM';
+                
+                if (period.startDate === period.endDate && period.startPeriod === period.endPeriod) {
+                    html += `📅 ${period.startDate} ${periodText} : ${period.status}<br>`;
                 } else {
-                    // Période
-                    html += `📅 Du ${period.start} au ${period.end} : ${period.status}<br>`;
+                    html += `📅 Du ${period.startDate} ${periodText} au ${period.endDate} ${endPeriodText} : ${period.status}<br>`;
                 }
             });
             
-            html += `<br><em>Total : ${periods.length} période(s) pour ${Object.keys(availabilities).length} jour(s)</em>`;
+            html += `<br><em>Total : ${periods.length} période(s) pour ${Object.keys(availabilities).length} créneau(x)</em>`;
             content.innerHTML = html;
         } else {
             summary.style.display = 'none';
@@ -468,20 +647,22 @@ function updateSummary() {
     }
 }
 
-// Envoi du formulaire
+// Initialisation
 document.addEventListener('DOMContentLoaded', function() {
+    prefillName();
+    setTimeout(prefillName, 500);
+    generateCalendar();
+    
+    // Gestion du formulaire
     const form = document.getElementById('availabilityForm');
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            console.log('Formulaire soumis !');
-            
             const nameField = document.getElementById('artistName');
             const notesField = document.getElementById('notes');
             
             if (!nameField || !notesField) {
-                console.error('Champs manquants');
                 alert('Erreur : champs du formulaire non trouvés');
                 return;
             }
@@ -489,36 +670,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const artistName = nameField.value;
             const comments = notesField.value;
             
-            console.log('Données:', { artistName, availabilities });
-            
-            // Vérifier qu'il y a des disponibilités sélectionnées
             if (Object.keys(availabilities).length === 0) {
-                alert('Veuillez sélectionner au moins une date !');
+                alert('Veuillez sélectionner au moins un créneau !');
                 return;
             }
             
-            // Grouper les dates en périodes
-            const periods = groupConsecutiveDates(availabilities);
-            console.log('Périodes:', periods);
-            
-            // Créer un record pour chaque période
+            const periods = groupConsecutiveHalfDays(availabilities);
             const promises = [];
             
             periods.forEach(period => {
                 const recordData = {
                     fields: {
                         "Contact text": artistName,
-                        "Début disponibilité": period.start,
-                        "Fin disponibilité": period.end,
+                        "Début disponibilité": period.startDate,
+                        "Fin disponibilité": period.endDate,
+                        "Période": period.startPeriod === 'morning' ? 'Matin' : 'Après-midi',
                         "Statut_Disponibilite": period.status,
                         "Commentaires": comments,
                         "Statut": "Reçu"
                     }
                 };
                 
-                console.log('Record envoyé:', recordData);
-                
-                // Ajouter la promesse d'envoi
                 const promise = fetch('https://api.airtable.com/v0/appfsMAdTCEaXSYfK/Disponibilités équipes', {
                     method: 'POST',
                     headers: {
@@ -526,30 +698,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(recordData)
-                }).then(response => {
-                    console.log('Réponse Airtable:', response.status);
-                    return response.json().then(data => {
-                        console.log('Données reçues:', data);
-                        return response;
-                    });
-                });
+                }).then(response => response.json().then(data => response));
                 
                 promises.push(promise);
             });
             
-            // Attendre que tous les envois soient terminés
             Promise.all(promises)
                 .then(responses => {
-                    console.log('Réponses:', responses);
-                    
-                    // Vérifier que tous les envois ont réussi
                     const allSuccessful = responses.every(response => response.ok);
                     
                     if (allSuccessful) {
-                        alert(`Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} date(s).`);
+                        alert(`Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} créneau(x).`);
                         form.reset();
                         availabilities = {};
                         updateSummary();
+                        generateCalendar(); // Régénérer pour effacer les sélections
                     } else {
                         throw new Error('Certains envois ont échoué');
                     }
