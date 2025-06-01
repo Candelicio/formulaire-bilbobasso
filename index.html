@@ -1,0 +1,365 @@
+<div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+    
+    <!-- En-tête -->
+    <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: #f0f8f0; border-radius: 8px;">
+        <h1 style="color: #2c5530; margin: 0;">Compagnie BiLBOBASSO</h1>
+        <p style="color: #666; margin: 10px 0 0 0;">Collecte des disponibilités</p>
+    </div>
+
+    <!-- Formulaire -->
+    <form id="availabilityForm" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        
+        <!-- Nom et Email -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Nom de l'artiste</label>
+            <input type="text" id="artistName" required 
+                   style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;"
+                   placeholder="Prénom Nom">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Email</label>
+            <input type="email" id="artistEmail" required 
+                   style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;"
+                   placeholder="votre.email@exemple.com">
+            <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                💡 Utilisez l'email qui est dans votre fiche contact Airtable
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #2c5530; font-size: 14px;">
+                <strong>Instructions :</strong> Sélectionnez d'abord votre statut (Disponible/Indisponible/Peut-être), 
+                puis cliquez sur les dates du calendrier ci-dessous.
+            </p>
+        </div>
+
+        <!-- Boutons de statut -->
+        <div style="margin-bottom: 20px;">
+            <p style="font-weight: bold; color: #333; margin-bottom: 10px;">Statut à appliquer :</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button type="button" onclick="setStatus('available')" id="btn-available"
+                        style="padding: 8px 16px; border: 2px solid #4CAF50; background: #4CAF50; color: white; border-radius: 20px; cursor: pointer;">
+                    Disponible
+                </button>
+                <button type="button" onclick="setStatus('unavailable')" id="btn-unavailable"
+                        style="padding: 8px 16px; border: 2px solid #f44336; background: transparent; color: #f44336; border-radius: 20px; cursor: pointer;">
+                    Indisponible
+                </button>
+            </div>
+        </div>
+
+        <!-- Calendrier simplifié -->
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="text-align: center; margin-bottom: 15px; color: #333;">Juin 2025</h3>
+            
+            <!-- Grille calendrier -->
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 400px; margin: 0 auto;">
+                <!-- En-têtes -->
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">L</div>
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">M</div>
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">M</div>
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">J</div>
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">V</div>
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">S</div>
+                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">D</div>
+                
+                <!-- Jours vides début -->
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                
+                <!-- Jours du mois -->
+                <div onclick="toggleDay(this, '2025-06-01')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">1</div>
+                <div onclick="toggleDay(this, '2025-06-02')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">2</div>
+                <div onclick="toggleDay(this, '2025-06-03')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">3</div>
+                <div onclick="toggleDay(this, '2025-06-04')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">4</div>
+                <div onclick="toggleDay(this, '2025-06-05')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">5</div>
+                <div onclick="toggleDay(this, '2025-06-06')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">6</div>
+                <div onclick="toggleDay(this, '2025-06-07')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">7</div>
+                <div onclick="toggleDay(this, '2025-06-08')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">8</div>
+                <div onclick="toggleDay(this, '2025-06-09')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">9</div>
+                <div onclick="toggleDay(this, '2025-06-10')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">10</div>
+                <div onclick="toggleDay(this, '2025-06-11')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">11</div>
+                <div onclick="toggleDay(this, '2025-06-12')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">12</div>
+                <div onclick="toggleDay(this, '2025-06-13')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">13</div>
+                <div onclick="toggleDay(this, '2025-06-14')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">14</div>
+                <div onclick="toggleDay(this, '2025-06-15')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">15</div>
+                <div onclick="toggleDay(this, '2025-06-16')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">16</div>
+                <div onclick="toggleDay(this, '2025-06-17')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">17</div>
+                <div onclick="toggleDay(this, '2025-06-18')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">18</div>
+                <div onclick="toggleDay(this, '2025-06-19')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">19</div>
+                <div onclick="toggleDay(this, '2025-06-20')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">20</div>
+                <div onclick="toggleDay(this, '2025-06-21')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">21</div>
+                <div onclick="toggleDay(this, '2025-06-22')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">22</div>
+                <div onclick="toggleDay(this, '2025-06-23')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">23</div>
+                <div onclick="toggleDay(this, '2025-06-24')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">24</div>
+                <div onclick="toggleDay(this, '2025-06-25')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">25</div>
+                <div onclick="toggleDay(this, '2025-06-26')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">26</div>
+                <div onclick="toggleDay(this, '2025-06-27')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">27</div>
+                <div onclick="toggleDay(this, '2025-06-28')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">28</div>
+                <div onclick="toggleDay(this, '2025-06-29')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">29</div>
+                <div onclick="toggleDay(this, '2025-06-30')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">30</div>
+            </div>
+
+            <!-- Légende -->
+            <div style="margin-top: 15px; text-align: center; font-size: 12px;">
+                <span style="background: #4CAF50; color: white; padding: 2px 8px; margin: 0 5px;">Disponible</span>
+                <span style="background: #f44336; color: white; padding: 2px 8px; margin: 0 5px;">Indisponible</span>
+            </div>
+        </div>
+
+        <!-- Commentaires -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Commentaires</label>
+            <textarea id="notes" rows="3" 
+                      style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px; font-family: Arial, sans-serif;"
+                      placeholder="Contraintes particulières, préférences..."></textarea>
+        </div>
+
+        <!-- Résumé -->
+        <div id="summary" style="background: #f0f8f0; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none;">
+            <h4 style="margin: 0 0 10px 0; color: #2c5530;">Résumé de vos disponibilités :</h4>
+            <div id="summaryContent" style="font-size: 14px; color: #555;"></div>
+        </div>
+
+        <!-- Bouton d'envoi -->
+        <button type="submit" style="width: 100%; padding: 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; font-weight: bold;">
+            Envoyer mes disponibilités
+        </button>
+    </form>
+</div>
+
+<script>
+let currentStatus = 'available';
+let availabilities = {};
+
+// Fonctions principales
+window.onload = function() {
+    // Vérifier si un nom est dans le localStorage (temporaire)
+    const savedName = sessionStorage.getItem('artistName');
+    const savedEmail = sessionStorage.getItem('artistEmail');
+    
+    if (savedName) {
+        document.getElementById('artistName').value = savedName;
+        document.getElementById('artistName').style.background = '#e8f5e8';
+    }
+    
+    if (savedEmail) {
+        document.getElementById('artistEmail').value = savedEmail;
+        document.getElementById('artistEmail').style.background = '#e8f5e8';
+    }
+    
+    // Demander le nom si pas défini
+    if (!savedName) {
+        setTimeout(function() {
+            const userName = prompt("Quel est votre nom ? (pour pré-remplir le formulaire)");
+            if (userName) {
+                document.getElementById('artistName').value = userName;
+                document.getElementById('artistName').style.background = '#e8f5e8';
+                sessionStorage.setItem('artistName', userName);
+            }
+            
+            const userEmail = prompt("Quel est votre email ? (pour pré-remplir le formulaire)");
+            if (userEmail) {
+                document.getElementById('artistEmail').value = userEmail;
+                document.getElementById('artistEmail').style.background = '#e8f5e8';
+                sessionStorage.setItem('artistEmail', userEmail);
+            }
+        }, 1000);
+    }
+};
+
+// Changer le statut sélectionné
+function setStatus(status) {
+    currentStatus = status;
+    
+    // Reset tous les boutons
+    document.getElementById('btn-available').style.background = 'transparent';
+    document.getElementById('btn-available').style.color = '#4CAF50';
+    document.getElementById('btn-unavailable').style.background = 'transparent';
+    document.getElementById('btn-unavailable').style.color = '#f44336';
+    
+    // Activer le bouton sélectionné
+    if (status === 'available') {
+        document.getElementById('btn-available').style.background = '#4CAF50';
+        document.getElementById('btn-available').style.color = 'white';
+    } else if (status === 'unavailable') {
+        document.getElementById('btn-unavailable').style.background = '#f44336';
+        document.getElementById('btn-unavailable').style.color = 'white';
+    }
+}
+
+// Cliquer sur une date
+function toggleDay(element, date) {
+    // Retirer l'ancien style
+    element.style.background = 'white';
+    element.style.color = 'black';
+    
+    // Appliquer le nouveau statut
+    availabilities[date] = currentStatus;
+    
+    if (currentStatus === 'available') {
+        element.style.background = '#4CAF50';
+        element.style.color = 'white';
+    } else if (currentStatus === 'unavailable') {
+        element.style.background = '#f44336';
+        element.style.color = 'white';
+    }
+    
+    updateSummary();
+}
+
+// Mettre à jour le résumé avec périodes
+function updateSummary() {
+    const summary = document.getElementById('summary');
+    const content = document.getElementById('summaryContent');
+    
+    if (Object.keys(availabilities).length > 0) {
+        summary.style.display = 'block';
+        
+        // Grouper en périodes pour l'affichage
+        const periods = groupConsecutiveDates(availabilities);
+        
+        let html = '<strong>Périodes qui seront envoyées :</strong><br><br>';
+        
+        periods.forEach(period => {
+            if (period.start === period.end) {
+                // Jour isolé
+                html += `📅 ${period.start} : ${period.status}<br>`;
+            } else {
+                // Période
+                html += `📅 Du ${period.start} au ${period.end} : ${period.status}<br>`;
+            }
+        });
+        
+        html += `<br><em>Total : ${periods.length} période(s) pour ${Object.keys(availabilities).length} jour(s)</em>`;
+        content.innerHTML = html;
+    } else {
+        summary.style.display = 'none';
+    }
+}
+
+// Fonction pour grouper les dates consécutives en périodes
+function groupConsecutiveDates(availabilities) {
+    const periods = [];
+    
+    // Séparer par statut (disponible/indisponible)
+    const availableDates = [];
+    const unavailableDates = [];
+    
+    for (let date in availabilities) {
+        if (availabilities[date] === 'available') {
+            availableDates.push(date);
+        } else {
+            unavailableDates.push(date);
+        }
+    }
+    
+    // Traiter chaque type de statut
+    [
+        { dates: availableDates, status: 'Disponible' },
+        { dates: unavailableDates, status: 'Indisponible' }
+    ].forEach(group => {
+        if (group.dates.length === 0) return;
+        
+        // Trier les dates
+        const sortedDates = group.dates.sort();
+        
+        let currentPeriod = {
+            start: sortedDates[0],
+            end: sortedDates[0],
+            status: group.status
+        };
+        
+        for (let i = 1; i < sortedDates.length; i++) {
+            const currentDate = new Date(sortedDates[i]);
+            const previousDate = new Date(currentPeriod.end);
+            const dayDifference = (currentDate - previousDate) / (1000 * 60 * 60 * 24);
+            
+            if (dayDifference === 1) {
+                // Date consécutive - étendre la période
+                currentPeriod.end = sortedDates[i];
+            } else {
+                // Date non consécutive - finaliser la période actuelle
+                periods.push(currentPeriod);
+                currentPeriod = {
+                    start: sortedDates[i],
+                    end: sortedDates[i],
+                    status: group.status
+                };
+            }
+        }
+        
+        // Ajouter la dernière période
+        periods.push(currentPeriod);
+    });
+    
+    return periods;
+}
+
+// Envoi du formulaire - 1 record par période
+document.getElementById('availabilityForm').onsubmit = function(e) {
+    e.preventDefault();
+    
+    const artistName = document.getElementById('artistName').value;
+    const artistEmail = document.getElementById('artistEmail').value;
+    const comments = document.getElementById('notes').value;
+    
+    // Vérifier qu'il y a des disponibilités sélectionnées
+    if (Object.keys(availabilities).length === 0) {
+        alert('Veuillez sélectionner au moins une date !');
+        return;
+    }
+    
+    // Grouper les dates en périodes
+    const periods = groupConsecutiveDates(availabilities);
+    
+    // Créer un record pour chaque période
+    const promises = [];
+    
+    periods.forEach(period => {
+        const recordData = {
+            fields: {
+                "Contact text": artistName,
+                "Email": artistEmail,
+                "Début disponibilité": period.start,
+                "Fin disponibilité": period.end,
+                "Statut_Disponibilite": period.status,
+                "Commentaires": comments,
+                "Statut": "Reçu"
+            }
+        };
+        
+        // Ajouter la promesse d'envoi
+        const promise = fetch('https://api.airtable.com/v0/appfsMAdTCEaXSYfK/Disponibilités équipes', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer patsLl5ZuaJRMM4uE.4719daf1e76068a691bce1dfcd1c77fc6453488a6da3cd23ea12f899b7fd81d4',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(recordData)
+        });
+        
+        promises.push(promise);
+    });
+    
+    // Attendre que tous les envois soient terminés
+    Promise.all(promises)
+        .then(responses => {
+            // Vérifier que tous les envois ont réussi
+            const allSuccessful = responses.every(response => response.ok);
+            
+            if (allSuccessful) {
+                alert(`Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} date(s).`);
+                document.getElementById('availabilityForm').reset();
+                availabilities = {};
+                updateSummary();
+            } else {
+                throw new Error('Certains envois ont échoué');
+            }
+        })
+        .catch(error => {
+            alert('Erreur lors de l\'envoi : ' + error.message);
+        });
+};
+</script>
