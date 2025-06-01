@@ -59,6 +59,12 @@
             background: transparent;
         }
         
+        #btn-full-day {
+            border-color: #ff9800;
+            color: #ff9800;
+            background: transparent;
+        }
+        
         .calendar-navigation {
             display: flex;
             justify-content: space-between;
@@ -120,7 +126,7 @@
             border: 2px solid #dee2e6;
             border-radius: 8px;
             background: white;
-            min-height: 70px;
+            min-height: 90px;
             position: relative;
         }
         
@@ -142,7 +148,7 @@
             display: flex;
             flex: 1;
             gap: 2px;
-            padding: 2px;
+            padding: 2px 2px 0 2px;
         }
         
         .half-day {
@@ -153,9 +159,9 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-            min-height: 35px;
+            min-height: 30px;
             border: 1px solid #ddd;
         }
         
@@ -165,11 +171,13 @@
         }
         
         .half-day.morning {
-            background: #f0f8ff;
+            background: white;
+            border: 1px solid #ddd;
         }
         
         .half-day.afternoon {
-            background: #fff8f0;
+            background: white;
+            border: 1px solid #ddd;
         }
         
         .half-day.available {
@@ -179,6 +187,37 @@
         }
         
         .half-day.unavailable {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .full-day-btn {
+            margin: 2px;
+            padding: 4px;
+            background: white;
+            border: 1px solid #ff9800;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+            color: #ff9800;
+            transition: all 0.2s ease;
+        }
+        
+        .full-day-btn:hover {
+            background: #fff3e0;
+            transform: scale(1.05);
+        }
+        
+        .full-day-btn.available {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .full-day-btn.unavailable {
             background: #f44336;
             color: white;
             border-color: #f44336;
@@ -238,7 +277,7 @@
             }
             
             .calendar-day {
-                min-height: 55px;
+                min-height: 75px;
             }
             
             .half-day {
@@ -248,6 +287,11 @@
             
             .day-number {
                 font-size: 11px;
+                padding: 2px;
+            }
+            
+            .full-day-btn {
+                font-size: 8px;
                 padding: 2px;
             }
         }
@@ -278,19 +322,17 @@
                     </button>
                 </div>
                 <p style="color: #666; font-size: 14px; text-align: center; margin-top: 10px;">
-                    Puis cliquez sur les créneaux AM/PM dans le calendrier
+                    Puis cliquez sur AM, PM ou "Journée" dans chaque case du calendrier
                 </p>
             </div>
 
             <!-- Légende -->
             <div class="legend">
                 <div class="legend-item">
-                    <div class="legend-color" style="background: #f0f8ff;"></div>
-                    <span>AM (9h-13h)</span>
+                    <span style="font-weight: bold;">AM - Matin (9h-13h)</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background: #fff8f0;"></div>
-                    <span>PM (14h-18h)</span>
+                    <span style="font-weight: bold;">PM - Après-midi (14h-18h)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background: #4CAF50;"></div>
@@ -337,7 +379,7 @@
     <script>
 let currentStatus = 'available';
 let availabilities = {}; // Format: "2025-06-01-morning": "available"
-let currentDate = new Date(2025, 5, 1); // Juin 2025 (mois 0-indexé)
+let currentDate = new Date(); // Date actuelle automatique
 
 const monthNames = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -345,6 +387,22 @@ const monthNames = [
 ];
 
 const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+// Initialiser la date au mois actuel ou au mois suivant si on est en fin d'année
+function initializeDate() {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    // Si on est en décembre, démarrer sur janvier de l'année suivante
+    if (currentMonth === 11) {
+        currentDate = new Date(currentYear + 1, 0, 1); // Janvier année suivante
+    } else {
+        currentDate = new Date(currentYear, currentMonth, 1); // Mois actuel
+    }
+    
+    console.log(`Calendrier initialisé pour ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`);
+}
 
 // Préfillage automatique AMÉLIORÉ
 function prefillName() {
@@ -407,6 +465,8 @@ function generateCalendar() {
     const calendar = document.getElementById('calendar');
     const currentMonthSpan = document.getElementById('currentMonth');
     
+    if (!calendar || !currentMonthSpan) return;
+    
     // Mettre à jour le titre du mois
     currentMonthSpan.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
     
@@ -451,6 +511,8 @@ function generateCalendar() {
         const nextMonthDay = new Date(year, month + 1, day);
         createDayElement(nextMonthDay, true);
     }
+    
+    updateNavigationButtons();
 }
 
 // Créer un élément jour avec demi-journées
@@ -458,7 +520,7 @@ function createDayElement(date, isOtherMonth) {
     const dayElement = document.createElement('div');
     dayElement.className = `calendar-day ${isOtherMonth ? 'other-month' : ''}`;
     
-    // Numéro du jour
+    // Numéro du jour (non-cliquable)
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-number';
     dayNumber.textContent = date.getDate();
@@ -484,11 +546,37 @@ function createDayElement(date, isOtherMonth) {
     
     dayElement.appendChild(halfDaysContainer);
     
+    // Bouton journée entière
+    const fullDayBtn = document.createElement('div');
+    fullDayBtn.className = 'full-day-btn';
+    fullDayBtn.textContent = 'Journée';
+    fullDayBtn.onclick = () => toggleFullDay(date);
+    dayElement.appendChild(fullDayBtn);
+    
     // Appliquer l'état existant si disponible
+    updateDayElementState(dayElement, date);
+    
+    document.getElementById('calendar').appendChild(dayElement);
+}
+
+// Mettre à jour l'état visuel d'un élément jour
+function updateDayElementState(dayElement, date) {
     const dateStr = formatDate(date);
     const morningKey = `${dateStr}-morning`;
     const afternoonKey = `${dateStr}-afternoon`;
     
+    const morning = dayElement.querySelector('.half-day.morning');
+    const afternoon = dayElement.querySelector('.half-day.afternoon');
+    const fullDayBtn = dayElement.querySelector('.full-day-btn');
+    
+    if (!morning || !afternoon || !fullDayBtn) return;
+    
+    // Nettoyer les classes existantes
+    morning.classList.remove('available', 'unavailable');
+    afternoon.classList.remove('available', 'unavailable');
+    fullDayBtn.classList.remove('available', 'unavailable');
+    
+    // Appliquer les nouveaux états
     if (availabilities[morningKey]) {
         morning.classList.add(availabilities[morningKey]);
     }
@@ -496,13 +584,48 @@ function createDayElement(date, isOtherMonth) {
         afternoon.classList.add(availabilities[afternoonKey]);
     }
     
-    document.getElementById('calendar').appendChild(dayElement);
+    // Mettre à jour le bouton journée entière si les deux demi-journées ont le même statut
+    const morningStatus = availabilities[morningKey];
+    const afternoonStatus = availabilities[afternoonKey];
+    if (morningStatus && afternoonStatus && morningStatus === afternoonStatus) {
+        fullDayBtn.classList.add(morningStatus);
+    }
 }
 
-// Changer de mois
+// Changer de mois avec limites annuelles
 function changeMonth(direction) {
-    currentDate.setMonth(currentDate.getMonth() + direction);
-    generateCalendar();
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + direction);
+    
+    const currentYear = new Date().getFullYear();
+    const newYear = newDate.getFullYear();
+    
+    // Limiter à l'année en cours et l'année suivante
+    if (newYear >= currentYear && newYear <= currentYear + 1) {
+        currentDate = newDate;
+        generateCalendar();
+        updateNavigationButtons();
+    }
+}
+
+// Mettre à jour l'état des boutons de navigation
+function updateNavigationButtons() {
+    const currentYear = new Date().getFullYear();
+    const calendarYear = currentDate.getFullYear();
+    const calendarMonth = currentDate.getMonth();
+    
+    const prevBtn = document.querySelector('.nav-btn');
+    const nextBtn = document.querySelectorAll('.nav-btn')[1];
+    
+    if (prevBtn && nextBtn) {
+        // Désactiver "précédent" si on est au début de l'année en cours
+        const isAtStart = (calendarYear === currentYear && calendarMonth === 0);
+        prevBtn.disabled = isAtStart;
+        
+        // Désactiver "suivant" si on est à la fin de l'année suivante
+        const isAtEnd = (calendarYear === currentYear + 1 && calendarMonth === 11);
+        nextBtn.disabled = isAtEnd;
+    }
 }
 
 // Formater la date en YYYY-MM-DD
@@ -521,11 +644,13 @@ function setStatus(status) {
     const btnUnavailable = document.getElementById('btn-unavailable');
     
     if (btnAvailable && btnUnavailable) {
+        // Reset tous les boutons
         btnAvailable.style.background = 'transparent';
         btnAvailable.style.color = '#4CAF50';
         btnUnavailable.style.background = 'transparent';
         btnUnavailable.style.color = '#f44336';
         
+        // Activer le bouton sélectionné
         if (status === 'available') {
             btnAvailable.style.background = '#4CAF50';
             btnAvailable.style.color = 'white';
@@ -536,33 +661,75 @@ function setStatus(status) {
     }
 }
 
+// Basculer une journée entière
+function toggleFullDay(date) {
+    const dateStr = formatDate(date);
+    const morningKey = `${dateStr}-morning`;
+    const afternoonKey = `${dateStr}-afternoon`;
+    
+    // Appliquer le statut aux deux demi-journées
+    availabilities[morningKey] = currentStatus;
+    availabilities[afternoonKey] = currentStatus;
+    
+    // Mettre à jour l'affichage
+    regenerateCalendar();
+    updateSummary();
+}
+
 // Basculer une demi-journée
 function toggleHalfDay(date, period) {
     const dateStr = formatDate(date);
     const key = `${dateStr}-${period}`;
     
-    // Trouver l'élément dans le DOM
-    const halfDayElements = document.querySelectorAll(`.half-day.${period}`);
-    let targetElement = null;
-    
-    halfDayElements.forEach(el => {
-        const parentDay = el.closest('.calendar-day');
-        const dayNumber = parentDay.querySelector('.day-number').textContent;
-        if (parseInt(dayNumber) === date.getDate()) {
-            targetElement = el;
-        }
-    });
-    
-    if (!targetElement) return;
-    
-    // Retirer les anciens styles
-    targetElement.classList.remove('available', 'unavailable');
-    
     // Appliquer le nouveau statut
     availabilities[key] = currentStatus;
-    targetElement.classList.add(currentStatus);
     
+    // Mettre à jour l'affichage
+    regenerateCalendar();
     updateSummary();
+}
+
+// Régénérer le calendrier sans perdre les sélections
+function regenerateCalendar() {
+    const calendar = document.getElementById('calendar');
+    if (!calendar) return;
+    
+    // Garder seulement les en-têtes et recréer les jours
+    const headers = calendar.querySelectorAll('.calendar-header');
+    calendar.innerHTML = '';
+    
+    // Remettre les en-têtes
+    headers.forEach(header => calendar.appendChild(header));
+    
+    // Recréer les jours avec les états mis à jour
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    
+    let startDay = firstDay.getDay();
+    startDay = startDay === 0 ? 6 : startDay - 1;
+    
+    // Jours du mois précédent
+    for (let i = startDay - 1; i >= 0; i--) {
+        const prevMonthDay = new Date(year, month, -i);
+        createDayElement(prevMonthDay, true);
+    }
+    
+    // Jours du mois actuel
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        createDayElement(date, false);
+    }
+    
+    // Jours du mois suivant
+    const totalCells = calendar.children.length - 7;
+    const remainingCells = 42 - totalCells;
+    for (let day = 1; day <= remainingCells; day++) {
+        const nextMonthDay = new Date(year, month + 1, day);
+        createDayElement(nextMonthDay, true);
+    }
 }
 
 // Grouper les demi-journées par périodes
@@ -649,9 +816,15 @@ function updateSummary() {
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser la date automatiquement
+    initializeDate();
+    
     prefillName();
     setTimeout(prefillName, 500);
     generateCalendar();
+    
+    // Vérifier automatiquement le changement d'année
+    setInterval(checkYearChange, 60000); // Vérifier chaque minute
     
     // Gestion du formulaire
     const form = document.getElementById('availabilityForm');
@@ -681,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
             periods.forEach(period => {
                 const recordData = {
                     fields: {
-                        "Contact text": artistName,
+                        "Nom": artistName,
                         "Début disponibilité": period.startDate,
                         "Fin disponibilité": period.endDate,
                         "Période": period.startPeriod === 'morning' ? 'Matin' : 'Après-midi',
@@ -712,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         form.reset();
                         availabilities = {};
                         updateSummary();
-                        generateCalendar(); // Régénérer pour effacer les sélections
+                        regenerateCalendar(); // Utiliser la nouvelle fonction
                     } else {
                         throw new Error('Certains envois ont échoué');
                     }
@@ -724,6 +897,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Fonction pour vérifier le changement d'année
+function checkYearChange() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const calendarYear = currentDate.getFullYear();
+    
+    // Si on détecte un changement d'année et qu'on n'est plus dans la bonne plage
+    if (calendarYear < currentYear) {
+        console.log('🎉 Nouvelle année détectée ! Mise à jour du calendrier...');
+        initializeDate();
+        generateCalendar();
+        
+        // Optionnel : Afficher une notification
+        if (now.getMonth() === 0 && now.getDate() === 1) {
+            setTimeout(() => {
+                alert('🎉 Bonne année ! Le calendrier a été mis à jour automatiquement.');
+            }, 2000);
+        }
+    }
+}
     </script>
 </body>
 </html>
