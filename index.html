@@ -127,6 +127,14 @@ let availabilities = {};
 window.onload = function() {
     // Préfillage par URL uniquement
     setTimeout(function() {
+        // Vérifier que les éléments existent
+        const nameField = document.getElementById('artistName');
+        if (!nameField) {
+            console.log('Champ nom pas encore disponible, nouvel essai...');
+            setTimeout(arguments.callee, 500); // Réessayer dans 500ms
+            return;
+        }
+        
         let artistName = '';
         
         // Méthode 1: URL standard (?nom=value)
@@ -157,25 +165,29 @@ window.onload = function() {
         }
         
         // Appliquer le préfillage si trouvé
-        if (artistName) {
-            document.getElementById('artistName').value = artistName;
-            document.getElementById('artistName').style.background = '#e8f5e8';
-            document.getElementById('artistName').style.borderColor = '#4CAF50';
+        if (artistName && nameField) {
+            nameField.value = artistName;
+            nameField.style.background = '#e8f5e8';
+            nameField.style.borderColor = '#4CAF50';
             
             // Ajouter un indicateur visuel
-            const nameField = document.getElementById('artistName').parentNode;
-            const indicator = document.createElement('div');
-            indicator.innerHTML = '✅ Nom prérempli automatiquement';
-            indicator.style.color = '#4CAF50';
-            indicator.style.fontSize = '12px';
-            indicator.style.marginTop = '5px';
-            indicator.style.fontWeight = 'bold';
-            nameField.appendChild(indicator);
+            const nameFieldParent = nameField.parentNode;
+            if (nameFieldParent && !nameFieldParent.querySelector('.prefill-indicator')) {
+                const indicator = document.createElement('div');
+                indicator.innerHTML = '✅ Nom prérempli automatiquement';
+                indicator.className = 'prefill-indicator';
+                indicator.style.color = '#4CAF50';
+                indicator.style.fontSize = '12px';
+                indicator.style.marginTop = '5px';
+                indicator.style.fontWeight = 'bold';
+                nameFieldParent.appendChild(indicator);
+            }
         }
         
         console.log('URL complète:', window.location.href);
         console.log('Nom trouvé:', artistName);
-    }, 500);
+        console.log('Préfillage appliqué:', !!artistName);
+    }, 1000); // Délai plus long pour laisser la page se charger
 };
 
 // Changer le statut sélectionné
