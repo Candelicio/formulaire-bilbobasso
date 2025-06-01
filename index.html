@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Disponibilités - BiLBOBASSO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .status-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        
+        .status-btn {
+            padding: 12px 24px;
+            border: 3px solid;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        #btn-available {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            background: #4CAF50;
+            color: white;
+        }
+        
+        #btn-unavailable {
+            border-color: #f44336;
+            color: #f44336;
+            background: transparent;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            font-weight: bold;
+            color: #495057;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            background: white;
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.other-month {
+            color: #ccc;
+            background: #f8f9fa;
+        }
+        
+        .summary {
+            display: none;
+            background: #e8f4fd;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Mes Disponibilités BiLBOBASSO</h1>
+        
+        <form id="availabilityForm">
+            <!-- Nom -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Nom Prénom</label>
+                <input type="text" id="artistName" required 
+                       style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;"
+                       placeholder="Prénom Nom">
+            </div>
+
+            <!-- Sélection du statut -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 15px;">Sélectionnez votre statut :</h3>
+                <div class="status-buttons">
+                    <button type="button" id="btn-available" class="status-btn" onclick="setStatus('available')">
+                        ✅ Disponible
+                    </button>
+                    <button type="button" id="btn-unavailable" class="status-btn" onclick="setStatus('unavailable')">
+                        ❌ Indisponible
+                    </button>
+                </div>
+                <p style="color: #666; font-size: 14px; text-align: center; margin-top: 10px;">
+                    Puis cliquez sur les dates dans le calendrier
+                </p>
+            </div>
+
+            <!-- Calendrier -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 15px;">Cliquez sur vos dates :</h3>
+                <div class="calendar">
+                    <div class="calendar-header">Lun</div>
+                    <div class="calendar-header">Mar</div>
+                    <div class="calendar-header">Mer</div>
+                    <div class="calendar-header">Jeu</div>
+                    <div class="calendar-header">Ven</div>
+                    <div class="calendar-header">Sam</div>
+                    <div class="calendar-header">Dim</div>
+                    
+                    <!-- Juin 2025 -->
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-26')">26</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-27')">27</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-28')">28</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-29')">29</div>
+                    <div class="calendar-day other-mon
