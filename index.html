@@ -735,55 +735,47 @@ function regenerateCalendar() {
 // Grouper les demi-journées par périodes
 function groupConsecutiveHalfDays(availabilities) {
     const periods = [];
-    const processedDates = new Set();
+    const grouped = { available: [], unavailable: [] };
     
-    // Grouper par date pour détecter les journées complètes
-    const dateGroups = {};
+    // Grouper par statut
     for (let key in availabilities) {
-        const [dateStr, period] = key.split('-');
         const status = availabilities[key];
-        
-        if (!dateGroups[dateStr]) {
-            dateGroups[dateStr] = {};
-        }
-        dateGroups[dateStr][period] = status;
+        grouped[status].push(key);
     }
     
-    // Traiter chaque date
-    Object.keys(dateGroups).sort().forEach(dateStr => {
-        const dayData = dateGroups[dateStr];
-        const morningStatus = dayData.morning;
-        const afternoonStatus = dayData.afternoon;
+    // Traiter chaque statut
+    Object.keys(grouped).forEach(status => {
+        if (grouped[status].length === 0) return;
         
-        // Si les deux demi-journées existent avec le même statut = journée complète
-        if (morningStatus && afternoonStatus && morningStatus === afternoonStatus) {
-            periods.push({
-                startDate: dateStr,
-                endDate: dateStr,
-                startPeriod: 'full',
-                endPeriod: 'full',
-                status: morningStatus === 'available' ? 'Disponible' : 'Indisponible'
-            });
-        } else {
-            // Sinon, traiter les demi-journées séparément
-            if (morningStatus) {
-                periods.push({
-                    startDate: dateStr,
-                    endDate: dateStr,
-                    startPeriod: 'morning',
-                    endPeriod: 'morning',
-                    status: morningStatus === 'available' ? 'Disponible' : 'Indisponible'
-                });
+        const sorted = grouped[status].sort();
+        let currentPeriod = null;
+        
+        sorted.forEach(key => {
+            const [dateStr, period] = key.split('-');
+            const date = dateStr;
+            
+            if (!currentPeriod || currentPeriod.endDate !== date || 
+                (currentPeriod.endPeriod === 'morning' && period === 'afternoon' && currentPeriod.endDate === date)) {
+                
+                if (currentPeriod) {
+                    periods.push(currentPeriod);
+                }
+                
+                currentPeriod = {
+                    startDate: date,
+                    startPeriod: period,
+                    endDate: date,
+                    endPeriod: period,
+                    status: status === 'available' ? 'Disponible' : 'Indisponible'
+                };
+            } else {
+                currentPeriod.endDate = date;
+                currentPeriod.endPeriod = period;
             }
-            if (afternoonStatus) {
-                periods.push({
-                    startDate: dateStr,
-                    endDate: dateStr,
-                    startPeriod: 'afternoon',
-                    endPeriod: 'afternoon',
-                    status: afternoonStatus === 'available' ? 'Disponible' : 'Indisponible'
-                });
-            }
+        });
+        
+        if (currentPeriod) {
+            periods.push(currentPeriod);
         }
     });
     
@@ -804,17 +796,8 @@ function updateSummary() {
             let html = '<strong>Créneaux qui seront envoyés :</strong><br><br>';
             
             periods.forEach(period => {
-                let periodText;
-                if (period.startPeriod === 'full') {
-                    periodText = 'Journée';
-                } else if (period.startPeriod === 'morning') {
-                    periodText = 'AM';
-                } else {
-                    periodText = 'PM';
-                }
-                
-                const endPeriodText = period.endPeriod === 'full' ? 'Journée' : 
-                                    (period.endPeriod === 'morning' ? 'AM' : 'PM');
+                const periodText = period.startPeriod === 'morning' ? 'AM' : 'PM';
+                const endPeriodText = period.endPeriod === 'morning' ? 'AM' : 'PM';
                 
                 if (period.startDate === period.endDate && period.startPeriod === period.endPeriod) {
                     html += `📅 ${period.startDate} ${periodText} : ${period.status}<br>`;
@@ -869,22 +852,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const promises = [];
             
             periods.forEach(period => {
-                // Déterminer la période à envoyer
-                let periodValue;
-                if (period.startPeriod === 'full') {
-                    periodValue = 'Journée';
-                } else if (period.startPeriod === 'morning') {
-                    periodValue = 'Matin';
-                } else {
-                    periodValue = 'Après-midi';
-                }
-                
                 const recordData = {
                     fields: {
                         "Contact text": artistName,
                         "Début disponibilité": period.startDate,
                         "Fin disponibilité": period.endDate,
-                        "Période": periodValue,
+                        "Période": period.startPeriod === 'morning' ? 'Matin' : 'Après-midi',
                         "Statut_Disponibilite": period.status,
                         "Commentaires": comments,
                         "Statut": "Reçu"
