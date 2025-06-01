@@ -1,137 +1,280 @@
-<div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-    
-    <!-- En-tête -->
-    <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: #f0f8f0; border-radius: 8px;">
-        <h1 style="color: #2c5530; margin: 0;">Compagnie BiLBOBASSO</h1>
-        <p style="color: #666; margin: 10px 0 0 0;">Collecte des disponibilités</p>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Disponibilités - BiLBOBASSO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .status-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        
+        .status-btn {
+            padding: 12px 24px;
+            border: 3px solid;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        #btn-available {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            background: #4CAF50;
+            color: white;
+        }
+        
+        #btn-unavailable {
+            border-color: #f44336;
+            color: #f44336;
+            background: transparent;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .calendar-header {
+            text-align: center;
+            font-weight: bold;
+            color: #495057;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            background: white;
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.other-month {
+            color: #ccc;
+            background: #f8f9fa;
+        }
+        
+        .summary {
+            display: none;
+            background: #e8f4fd;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Mes Disponibilités BiLBOBASSO</h1>
+        
+        <form id="availabilityForm">
+            <!-- Nom -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Nom Prénom</label>
+                <input type="text" id="artistName" required 
+                       style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;"
+                       placeholder="Prénom Nom">
+            </div>
+
+            <!-- Sélection du statut -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 15px;">Sélectionnez votre statut :</h3>
+                <div class="status-buttons">
+                    <button type="button" id="btn-available" class="status-btn" onclick="setStatus('available')">
+                        ✅ Disponible
+                    </button>
+                    <button type="button" id="btn-unavailable" class="status-btn" onclick="setStatus('unavailable')">
+                        ❌ Indisponible
+                    </button>
+                </div>
+                <p style="color: #666; font-size: 14px; text-align: center; margin-top: 10px;">
+                    Puis cliquez sur les dates dans le calendrier
+                </p>
+            </div>
+
+            <!-- Calendrier -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 15px;">Cliquez sur vos dates :</h3>
+                <div class="calendar">
+                    <div class="calendar-header">Lun</div>
+                    <div class="calendar-header">Mar</div>
+                    <div class="calendar-header">Mer</div>
+                    <div class="calendar-header">Jeu</div>
+                    <div class="calendar-header">Ven</div>
+                    <div class="calendar-header">Sam</div>
+                    <div class="calendar-header">Dim</div>
+                    
+                    <!-- Juin 2025 -->
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-26')">26</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-27')">27</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-28')">28</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-29')">29</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-30')">30</div>
+                    <div class="calendar-day other-month" onclick="toggleDay(this, '2025-05-31')">31</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-01')">1</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-02')">2</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-03')">3</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-04')">4</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-05')">5</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-06')">6</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-07')">7</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-08')">8</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-09')">9</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-10')">10</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-11')">11</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-12')">12</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-13')">13</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-14')">14</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-15')">15</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-16')">16</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-17')">17</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-18')">18</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-19')">19</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-20')">20</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-21')">21</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-22')">22</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-23')">23</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-24')">24</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-25')">25</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-26')">26</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-27')">27</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-28')">28</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-29')">29</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-06-30')">30</div>
+                    
+                    <!-- Juillet 2025 -->
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-01')">1</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-02')">2</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-03')">3</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-04')">4</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-05')">5</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-06')">6</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-07')">7</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-08')">8</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-09')">9</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-10')">10</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-11')">11</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-12')">12</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-13')">13</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-14')">14</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-15')">15</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-16')">16</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-17')">17</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-18')">18</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-19')">19</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-20')">20</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-21')">21</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-22')">22</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-23')">23</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-24')">24</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-25')">25</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-26')">26</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-27')">27</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-28')">28</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-29')">29</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-30')">30</div>
+                    <div class="calendar-day" onclick="toggleDay(this, '2025-07-31')">31</div>
+                </div>
+            </div>
+
+            <!-- Résumé -->
+            <div id="summary" class="summary">
+                <div id="summaryContent"></div>
+            </div>
+
+            <!-- Notes -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Notes (optionnel)</label>
+                <textarea id="notes" rows="3" 
+                          style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px; resize: vertical;"
+                          placeholder="Commentaires, contraintes particulières..."></textarea>
+            </div>
+
+            <!-- Bouton d'envoi -->
+            <button type="submit" class="submit-btn">
+                📤 Envoyer mes disponibilités
+            </button>
+        </form>
     </div>
 
-    <!-- Formulaire -->
-    <form id="availabilityForm" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        
-        <!-- Nom -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Nom Prénom</label>
-            <input type="text" id="artistName" required 
-                   style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px;"
-                   placeholder="Prénom Nom">
-        </div>
-
-        <!-- Instructions -->
-        <div style="background: #e8f5e8; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <p style="margin: 0; color: #2c5530; font-size: 14px;">
-                <strong>Instructions :</strong> Sélectionnez d'abord votre statut (Disponible/Indisponible/Peut-être), 
-                puis cliquez sur les dates du calendrier ci-dessous.
-            </p>
-        </div>
-
-        <!-- Boutons de statut -->
-        <div style="margin-bottom: 20px;">
-            <p style="font-weight: bold; color: #333; margin-bottom: 10px;">Statut à appliquer :</p>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                <button type="button" onclick="setStatus('available')" id="btn-available"
-                        style="padding: 8px 16px; border: 2px solid #4CAF50; background: #4CAF50; color: white; border-radius: 20px; cursor: pointer;">
-                    Disponible
-                </button>
-                <button type="button" onclick="setStatus('unavailable')" id="btn-unavailable"
-                        style="padding: 8px 16px; border: 2px solid #f44336; background: transparent; color: #f44336; border-radius: 20px; cursor: pointer;">
-                    Indisponible
-                </button>
-            </div>
-        </div>
-
-        <!-- Calendrier simplifié -->
-        <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-            <h3 style="text-align: center; margin-bottom: 15px; color: #333;">Juin 2025</h3>
-            
-            <!-- Grille calendrier -->
-            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; max-width: 400px; margin: 0 auto;">
-                <!-- En-têtes -->
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">L</div>
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">M</div>
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">M</div>
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">J</div>
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">V</div>
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">S</div>
-                <div style="text-align: center; font-weight: bold; padding: 8px; background: #666; color: white;">D</div>
-                
-                <!-- Jours vides début -->
-                <div></div><div></div><div></div><div></div><div></div><div></div>
-                
-                <!-- Jours du mois -->
-                <div onclick="toggleDay(this, '2025-06-01')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">1</div>
-                <div onclick="toggleDay(this, '2025-06-02')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">2</div>
-                <div onclick="toggleDay(this, '2025-06-03')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">3</div>
-                <div onclick="toggleDay(this, '2025-06-04')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">4</div>
-                <div onclick="toggleDay(this, '2025-06-05')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">5</div>
-                <div onclick="toggleDay(this, '2025-06-06')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">6</div>
-                <div onclick="toggleDay(this, '2025-06-07')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">7</div>
-                <div onclick="toggleDay(this, '2025-06-08')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">8</div>
-                <div onclick="toggleDay(this, '2025-06-09')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">9</div>
-                <div onclick="toggleDay(this, '2025-06-10')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">10</div>
-                <div onclick="toggleDay(this, '2025-06-11')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">11</div>
-                <div onclick="toggleDay(this, '2025-06-12')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">12</div>
-                <div onclick="toggleDay(this, '2025-06-13')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">13</div>
-                <div onclick="toggleDay(this, '2025-06-14')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">14</div>
-                <div onclick="toggleDay(this, '2025-06-15')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">15</div>
-                <div onclick="toggleDay(this, '2025-06-16')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">16</div>
-                <div onclick="toggleDay(this, '2025-06-17')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">17</div>
-                <div onclick="toggleDay(this, '2025-06-18')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">18</div>
-                <div onclick="toggleDay(this, '2025-06-19')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">19</div>
-                <div onclick="toggleDay(this, '2025-06-20')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">20</div>
-                <div onclick="toggleDay(this, '2025-06-21')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">21</div>
-                <div onclick="toggleDay(this, '2025-06-22')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">22</div>
-                <div onclick="toggleDay(this, '2025-06-23')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">23</div>
-                <div onclick="toggleDay(this, '2025-06-24')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">24</div>
-                <div onclick="toggleDay(this, '2025-06-25')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">25</div>
-                <div onclick="toggleDay(this, '2025-06-26')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">26</div>
-                <div onclick="toggleDay(this, '2025-06-27')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">27</div>
-                <div onclick="toggleDay(this, '2025-06-28')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">28</div>
-                <div onclick="toggleDay(this, '2025-06-29')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">29</div>
-                <div onclick="toggleDay(this, '2025-06-30')" style="text-align: center; padding: 10px; background: white; border: 1px solid #ddd; cursor: pointer;">30</div>
-            </div>
-
-            <!-- Légende -->
-            <div style="margin-top: 15px; text-align: center; font-size: 12px;">
-                <span style="background: #4CAF50; color: white; padding: 2px 8px; margin: 0 5px;">Disponible</span>
-                <span style="background: #f44336; color: white; padding: 2px 8px; margin: 0 5px;">Indisponible</span>
-            </div>
-        </div>
-
-        <!-- Commentaires -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Commentaires</label>
-            <textarea id="notes" rows="3" 
-                      style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px; font-family: Arial, sans-serif;"
-                      placeholder="Contraintes particulières, préférences..."></textarea>
-        </div>
-
-        <!-- Résumé -->
-        <div id="summary" style="background: #f0f8f0; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none;">
-            <h4 style="margin: 0 0 10px 0; color: #2c5530;">Résumé de vos disponibilités :</h4>
-            <div id="summaryContent" style="font-size: 14px; color: #555;"></div>
-        </div>
-
-        <!-- Bouton d'envoi -->
-        <button type="submit" style="width: 100%; padding: 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; font-weight: bold;">
-            Envoyer mes disponibilités
-        </button>
-    </form>
-</div>
-
-<script>
+    <script>
 let currentStatus = 'available';
 let availabilities = {};
 
-// Fonctions principales
-window.onload = function() {
+// Préfillage automatique
+document.addEventListener('DOMContentLoaded', function() {
     // Préfillage par URL uniquement
     setTimeout(function() {
-        // Vérifier que les éléments existent
         const nameField = document.getElementById('artistName');
         if (!nameField) {
             console.log('Champ nom pas encore disponible, nouvel essai...');
-            setTimeout(arguments.callee, 500); // Réessayer dans 500ms
+            setTimeout(arguments.callee, 500);
             return;
         }
         
@@ -187,26 +330,31 @@ window.onload = function() {
         console.log('URL complète:', window.location.href);
         console.log('Nom trouvé:', artistName);
         console.log('Préfillage appliqué:', !!artistName);
-    }, 1000); // Délai plus long pour laisser la page se charger
-};
+    }, 1000);
+});
 
 // Changer le statut sélectionné
 function setStatus(status) {
     currentStatus = status;
     
-    // Reset tous les boutons
-    document.getElementById('btn-available').style.background = 'transparent';
-    document.getElementById('btn-available').style.color = '#4CAF50';
-    document.getElementById('btn-unavailable').style.background = 'transparent';
-    document.getElementById('btn-unavailable').style.color = '#f44336';
+    const btnAvailable = document.getElementById('btn-available');
+    const btnUnavailable = document.getElementById('btn-unavailable');
     
-    // Activer le bouton sélectionné
-    if (status === 'available') {
-        document.getElementById('btn-available').style.background = '#4CAF50';
-        document.getElementById('btn-available').style.color = 'white';
-    } else if (status === 'unavailable') {
-        document.getElementById('btn-unavailable').style.background = '#f44336';
-        document.getElementById('btn-unavailable').style.color = 'white';
+    if (btnAvailable && btnUnavailable) {
+        // Reset tous les boutons
+        btnAvailable.style.background = 'transparent';
+        btnAvailable.style.color = '#4CAF50';
+        btnUnavailable.style.background = 'transparent';
+        btnUnavailable.style.color = '#f44336';
+        
+        // Activer le bouton sélectionné
+        if (status === 'available') {
+            btnAvailable.style.background = '#4CAF50';
+            btnAvailable.style.color = 'white';
+        } else if (status === 'unavailable') {
+            btnUnavailable.style.background = '#f44336';
+            btnUnavailable.style.color = 'white';
+        }
     }
 }
 
@@ -228,36 +376,6 @@ function toggleDay(element, date) {
     }
     
     updateSummary();
-}
-
-// Mettre à jour le résumé avec périodes
-function updateSummary() {
-    const summary = document.getElementById('summary');
-    const content = document.getElementById('summaryContent');
-    
-    if (Object.keys(availabilities).length > 0) {
-        summary.style.display = 'block';
-        
-        // Grouper en périodes pour l'affichage
-        const periods = groupConsecutiveDates(availabilities);
-        
-        let html = '<strong>Périodes qui seront envoyées :</strong><br><br>';
-        
-        periods.forEach(period => {
-            if (period.start === period.end) {
-                // Jour isolé
-                html += `📅 ${period.start} : ${period.status}<br>`;
-            } else {
-                // Période
-                html += `📅 Du ${period.start} au ${period.end} : ${period.status}<br>`;
-            }
-        });
-        
-        html += `<br><em>Total : ${periods.length} période(s) pour ${Object.keys(availabilities).length} jour(s)</em>`;
-        content.innerHTML = html;
-    } else {
-        summary.style.display = 'none';
-    }
 }
 
 // Fonction pour grouper les dates consécutives en périodes
@@ -318,68 +436,131 @@ function groupConsecutiveDates(availabilities) {
     return periods;
 }
 
-// Envoi du formulaire - 1 record par période
-document.getElementById('availabilityForm').onsubmit = function(e) {
-    e.preventDefault();
+// Mettre à jour le résumé avec périodes
+function updateSummary() {
+    const summary = document.getElementById('summary');
+    const content = document.getElementById('summaryContent');
     
-    const artistName = document.getElementById('artistName').value;
-    const artistEmail = document.getElementById('artistEmail').value;
-    const comments = document.getElementById('notes').value;
-    
-    // Vérifier qu'il y a des disponibilités sélectionnées
-    if (Object.keys(availabilities).length === 0) {
-        alert('Veuillez sélectionner au moins une date !');
-        return;
-    }
-    
-    // Grouper les dates en périodes
-    const periods = groupConsecutiveDates(availabilities);
-    
-    // Créer un record pour chaque période
-    const promises = [];
-    
-    periods.forEach(period => {
-        const recordData = {
-            fields: {
-                "Contact text": artistName,
-                "Début disponibilité": period.start,
-                "Fin disponibilité": period.end,
-                "Statut_Disponibilite": period.status,
-                "Commentaires": comments,
-                "Statut": "Reçu"
-            }
-        };
-        
-        // Ajouter la promesse d'envoi
-        const promise = fetch('https://api.airtable.com/v0/appfsMAdTCEaXSYfK/Disponibilités équipes', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer patsLl5ZuaJRMM4uE.4719daf1e76068a691bce1dfcd1c77fc6453488a6da3cd23ea12f899b7fd81d4',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(recordData)
-        });
-        
-        promises.push(promise);
-    });
-    
-    // Attendre que tous les envois soient terminés
-    Promise.all(promises)
-        .then(responses => {
-            // Vérifier que tous les envois ont réussi
-            const allSuccessful = responses.every(response => response.ok);
+    if (summary && content) {
+        if (Object.keys(availabilities).length > 0) {
+            summary.style.display = 'block';
             
-            if (allSuccessful) {
-                alert(`Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} date(s).`);
-                document.getElementById('availabilityForm').reset();
-                availabilities = {};
-                updateSummary();
-            } else {
-                throw new Error('Certains envois ont échoué');
+            // Grouper en périodes pour l'affichage
+            const periods = groupConsecutiveDates(availabilities);
+            
+            let html = '<strong>Périodes qui seront envoyées :</strong><br><br>';
+            
+            periods.forEach(period => {
+                if (period.start === period.end) {
+                    // Jour isolé
+                    html += `📅 ${period.start} : ${period.status}<br>`;
+                } else {
+                    // Période
+                    html += `📅 Du ${period.start} au ${period.end} : ${period.status}<br>`;
+                }
+            });
+            
+            html += `<br><em>Total : ${periods.length} période(s) pour ${Object.keys(availabilities).length} jour(s)</em>`;
+            content.innerHTML = html;
+        } else {
+            summary.style.display = 'none';
+        }
+    }
+}
+
+// Envoi du formulaire
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('availabilityForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            console.log('Formulaire soumis !');
+            
+            const nameField = document.getElementById('artistName');
+            const notesField = document.getElementById('notes');
+            
+            if (!nameField || !notesField) {
+                console.error('Champs manquants');
+                alert('Erreur : champs du formulaire non trouvés');
+                return;
             }
-        })
-        .catch(error => {
-            alert('Erreur lors de l\'envoi : ' + error.message);
+            
+            const artistName = nameField.value;
+            const comments = notesField.value;
+            
+            console.log('Données:', { artistName, availabilities });
+            
+            // Vérifier qu'il y a des disponibilités sélectionnées
+            if (Object.keys(availabilities).length === 0) {
+                alert('Veuillez sélectionner au moins une date !');
+                return;
+            }
+            
+            // Grouper les dates en périodes
+            const periods = groupConsecutiveDates(availabilities);
+            console.log('Périodes:', periods);
+            
+            // Créer un record pour chaque période
+            const promises = [];
+            
+            periods.forEach(period => {
+                const recordData = {
+                    fields: {
+                        "Contact text": artistName,
+                        "Début disponibilité": period.start,
+                        "Fin disponibilité": period.end,
+                        "Statut_Disponibilite": period.status,
+                        "Commentaires": comments,
+                        "Statut": "Reçu"
+                    }
+                };
+                
+                console.log('Record envoyé:', recordData);
+                
+                // Ajouter la promesse d'envoi
+                const promise = fetch('https://api.airtable.com/v0/appfsMAdTCEaXSYfK/Disponibilités équipes', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer patsLl5ZuaJRMM4uE.4719daf1e76068a691bce1dfcd1c77fc6453488a6da3cd23ea12f899b7fd81d4',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(recordData)
+                }).then(response => {
+                    console.log('Réponse Airtable:', response.status);
+                    return response.json().then(data => {
+                        console.log('Données reçues:', data);
+                        return response;
+                    });
+                });
+                
+                promises.push(promise);
+            });
+            
+            // Attendre que tous les envois soient terminés
+            Promise.all(promises)
+                .then(responses => {
+                    console.log('Réponses:', responses);
+                    
+                    // Vérifier que tous les envois ont réussi
+                    const allSuccessful = responses.every(response => response.ok);
+                    
+                    if (allSuccessful) {
+                        alert(`Disponibilités enregistrées avec succès !\n${periods.length} période(s) envoyée(s) pour ${Object.keys(availabilities).length} date(s).`);
+                        form.reset();
+                        availabilities = {};
+                        updateSummary();
+                    } else {
+                        throw new Error('Certains envois ont échoué');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de l\'envoi : ' + error.message);
+                });
         });
-};
-</script>
+    }
+});
+    </script>
+</body>
+</html>
