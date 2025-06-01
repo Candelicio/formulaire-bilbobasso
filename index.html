@@ -135,38 +135,57 @@ let availabilities = {};
 
 // Fonctions principales
 window.onload = function() {
-    // Vérifier si un nom est dans le localStorage (temporaire)
-    const savedName = sessionStorage.getItem('artistName');
-    const savedEmail = sessionStorage.getItem('artistEmail');
-    
-    if (savedName) {
-        document.getElementById('artistName').value = savedName;
-        document.getElementById('artistName').style.background = '#e8f5e8';
-    }
-    
-    if (savedEmail) {
-        document.getElementById('artistEmail').value = savedEmail;
-        document.getElementById('artistEmail').style.background = '#e8f5e8';
-    }
-    
-    // Demander le nom si pas défini
-    if (!savedName) {
-        setTimeout(function() {
-            const userName = prompt("Quel est votre nom ? (pour pré-remplir le formulaire)");
-            if (userName) {
-                document.getElementById('artistName').value = userName;
-                document.getElementById('artistName').style.background = '#e8f5e8';
-                sessionStorage.setItem('artistName', userName);
+    // Préfillage par URL uniquement
+    setTimeout(function() {
+        let artistName = '';
+        
+        // Méthode 1: URL standard (?nom=value)
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            artistName = urlParams.get('nom') || urlParams.get('name') || '';
+        } catch(e) {
+            console.log('URL params failed');
+        }
+        
+        // Méthode 2: Hash (#nom=value)
+        if (!artistName && window.location.hash) {
+            try {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                artistName = hashParams.get('nom') || hashParams.get('name') || '';
+            } catch(e) {
+                console.log('Hash params failed');
             }
+        }
+        
+        // Méthode 3: Lecture manuelle de l'URL
+        if (!artistName) {
+            const url = window.location.href;
+            const match = url.match(/[?&#](?:nom|name)=([^&]+)/);
+            if (match) {
+                artistName = decodeURIComponent(match[1].replace(/\+/g, ' '));
+            }
+        }
+        
+        // Appliquer le préfillage si trouvé
+        if (artistName) {
+            document.getElementById('artistName').value = artistName;
+            document.getElementById('artistName').style.background = '#e8f5e8';
+            document.getElementById('artistName').style.borderColor = '#4CAF50';
             
-            const userEmail = prompt("Quel est votre email ? (pour pré-remplir le formulaire)");
-            if (userEmail) {
-                document.getElementById('artistEmail').value = userEmail;
-                document.getElementById('artistEmail').style.background = '#e8f5e8';
-                sessionStorage.setItem('artistEmail', userEmail);
-            }
-        }, 1000);
-    }
+            // Ajouter un indicateur visuel
+            const nameField = document.getElementById('artistName').parentNode;
+            const indicator = document.createElement('div');
+            indicator.innerHTML = '✅ Nom prérempli automatiquement';
+            indicator.style.color = '#4CAF50';
+            indicator.style.fontSize = '12px';
+            indicator.style.marginTop = '5px';
+            indicator.style.fontWeight = 'bold';
+            nameField.appendChild(indicator);
+        }
+        
+        console.log('URL complète:', window.location.href);
+        console.log('Nom trouvé:', artistName);
+    }, 500);
 };
 
 // Changer le statut sélectionné
